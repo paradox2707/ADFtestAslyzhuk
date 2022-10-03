@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "ODataSource",
-						"query": "$select=UserName&$filter=UserName%20eq%20%27russellwhyte%27",
+						"query": "",
 						"httpRequestTimeout": "00:05:00"
 					},
 					"sink": {
