@@ -1,0 +1,16 @@
+{
+	"name": "ODataResource1People",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "OData1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "ODataResource",
+		"schema": [],
+		"typeProperties": {
+			"path": "People"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
