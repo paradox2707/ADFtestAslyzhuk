@@ -1,0 +1,24 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "ADFtestAslyzhuk"
+		},
+		"AzureSqlDatabase1_connectionString": {
+			"value": ""
+		},
+		"OData1_properties_typeProperties_url": {
+			"value": "https://services.odata.org/V4/TripPinService/"
+		},
+		"RestService1_properties_typeProperties_url": {
+			"value": "https://services.odata.org/TripPinRESTierService/(S(5kr13b4f0lus22rrockv2twg))/People"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
