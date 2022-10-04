@@ -11,6 +11,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'"
 		},
+		"SqlServer1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'SqlServer1'"
+		},
 		"OData1_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://services.odata.org/V4/TripPinService/"
@@ -24,6 +28,87 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/Filter sample')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "From Odata to SQL",
+						"description": "",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ODataSource",
+								"query": "$select=UserName&$filter=UserName%20eq%20%27russellwhyte%27",
+								"httpRequestTimeout": "00:05:00"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"UserName"
+									]
+								},
+								"sqlWriterUseTableLock": false,
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "UserName",
+											"type": "String"
+										},
+										"sink": {
+											"name": "UserName",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "ODataResource1People",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "AzureTablePersons",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ODataResource1People')]",
+				"[concat(variables('factoryId'), '/datasets/AzureTablePersons')]"
+			]
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Pagination sample')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
@@ -105,7 +190,7 @@
 						],
 						"outputs": [
 							{
-								"referenceName": "AzureSqlTable1",
+								"referenceName": "AzureTablePersons",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -121,11 +206,11 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ODataResource1People')]",
-				"[concat(variables('factoryId'), '/datasets/AzureSqlTable1')]"
+				"[concat(variables('factoryId'), '/datasets/AzureTablePersons')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
+			"name": "[concat(parameters('factoryName'), '/AzureTablePersons')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -226,14 +311,112 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Filter sample')]",
+			"name": "[concat(parameters('factoryName'), '/TutorialIntegrationRuntime')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SqlServer1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('SqlServer1_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "TutorialIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/TutorialIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LocalTableEmploees')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SqlServer1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "FirstName",
+						"type": "varchar"
+					},
+					{
+						"name": "LastName",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "emp"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SqlServer1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureTableEmployees')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "FirstName",
+						"type": "varchar"
+					},
+					{
+						"name": "SecondName",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Employees"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LocalDB to AzureDB _fault tolerance schema_')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "From Odata to SQL",
-						"description": "",
+						"name": "Copy data1",
 						"type": "Copy",
 						"dependsOn": [],
 						"policy": {
@@ -246,21 +429,14 @@
 						"userProperties": [],
 						"typeProperties": {
 							"source": {
-								"type": "ODataSource",
-								"query": "$select=UserName&$filter=UserName%20eq%20%27russellwhyte%27",
-								"httpRequestTimeout": "00:05:00"
+								"type": "SqlServerSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"writeBehavior": "upsert",
-								"upsertSettings": {
-									"useTempDB": true,
-									"keys": [
-										"UserName"
-									]
-								},
-								"sqlWriterUseTableLock": false,
-								"disableMetricsCollection": false
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
 							},
 							"enableStaging": false,
 							"translator": {
@@ -268,27 +444,46 @@
 								"mappings": [
 									{
 										"source": {
-											"name": "UserName",
-											"type": "String"
+											"name": "FirstName",
+											"type": "String",
+											"physicalType": "varchar"
 										},
 										"sink": {
-											"name": "UserName",
-											"type": "String"
+											"name": "FirstName",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "LastName",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "SecondName",
+											"type": "String",
+											"physicalType": "varchar"
 										}
 									}
-								]
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
 							}
 						},
 						"inputs": [
 							{
-								"referenceName": "ODataResource1People",
+								"referenceName": "LocalTableEmploees",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
 						],
 						"outputs": [
 							{
-								"referenceName": "AzureSqlTable1",
+								"referenceName": "AzureTableEmployees",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -302,8 +497,8 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ODataResource1People')]",
-				"[concat(variables('factoryId'), '/datasets/AzureSqlTable1')]"
+				"[concat(variables('factoryId'), '/datasets/LocalTableEmploees')]",
+				"[concat(variables('factoryId'), '/datasets/AzureTableEmployees')]"
 			]
 		}
 	]
