@@ -38,7 +38,7 @@
 								"referenceName": "linkedService1",
 								"type": "LinkedServiceReference"
 							},
-							"path": "order-fiels"
+							"path": ""
 						}
 					},
 					"translator": {
