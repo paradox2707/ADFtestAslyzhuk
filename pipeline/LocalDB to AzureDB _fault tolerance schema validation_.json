@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Get Metadata1",
+				"name": "Get Inbound Schema",
 				"type": "GetMetadata",
 				"dependsOn": [],
 				"policy": {
@@ -25,20 +25,26 @@
 				}
 			},
 			{
-				"name": "If Condition1",
+				"name": "If Condition - Inbound Schema Equals Valid Schema",
 				"type": "IfCondition",
 				"dependsOn": [
 					{
-						"activity": "Get Metadata1",
+						"activity": "Get Inbound Schema",
 						"dependencyConditions": [
-							"Skipped"
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Set Inbound Valid Schema",
+						"dependencyConditions": [
+							"Succeeded"
 						]
 					}
 				],
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@equals(1,1)",
+						"value": "@equals(activity('Get Inbound Schema').output.structure,variables('Inbound Table Structure'))",
 						"type": "Expression"
 					},
 					"ifTrueActivities": [
@@ -131,8 +137,54 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "Set Inbound Valid Schema",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Inbound Table Structure",
+					"value": [
+						{
+							"physicalName": "ID",
+							"type": "Int32",
+							"logicalType": "Int32",
+							"name": "ID",
+							"physicalType": "int",
+							"precision": 10,
+							"scale": 255,
+							"DotNetType": "System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+						},
+						{
+							"physicalName": "FirstName",
+							"type": "String",
+							"logicalType": "String",
+							"name": "FirstName",
+							"physicalType": "varchar",
+							"precision": 255,
+							"scale": 255,
+							"DotNetType": "System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+						},
+						{
+							"physicalName": "LastName",
+							"type": "String",
+							"logicalType": "String",
+							"name": "LastName",
+							"physicalType": "varchar",
+							"precision": 255,
+							"scale": 255,
+							"DotNetType": "System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+						}
+					]
+				}
 			}
 		],
+		"variables": {
+			"Inbound Table Structure": {
+				"type": "Array"
+			}
+		},
 		"annotations": []
 	}
 }
