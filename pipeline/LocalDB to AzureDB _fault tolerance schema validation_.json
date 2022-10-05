@@ -49,7 +49,7 @@
 					},
 					"ifTrueActivities": [
 						{
-							"name": "Copy data1_copy1",
+							"name": "Copy data if inbound structure is valid",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
