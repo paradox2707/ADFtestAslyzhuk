@@ -35,7 +35,7 @@
 						]
 					},
 					{
-						"activity": "Set Inbound Valid Schema",
+						"activity": "Set Inbound Valid Structure",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -139,7 +139,7 @@
 				}
 			},
 			{
-				"name": "Set Inbound Valid Schema",
+				"name": "Set Inbound Valid Structure",
 				"type": "SetVariable",
 				"dependsOn": [],
 				"userProperties": [],
