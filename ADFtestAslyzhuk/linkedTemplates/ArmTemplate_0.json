@@ -466,7 +466,7 @@
 								]
 							},
 							{
-								"activity": "Set Inbound Valid Schema",
+								"activity": "Set Inbound Valid Structure",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -480,7 +480,7 @@
 							},
 							"ifTrueActivities": [
 								{
-									"name": "Copy data1_copy1",
+									"name": "Copy data if inbound structure is valid",
 									"type": "Copy",
 									"dependsOn": [],
 									"policy": {
@@ -572,7 +572,7 @@
 						}
 					},
 					{
-						"name": "Set Inbound Valid Schema",
+						"name": "Set Inbound Valid Structure",
 						"type": "SetVariable",
 						"dependsOn": [],
 						"userProperties": [],
