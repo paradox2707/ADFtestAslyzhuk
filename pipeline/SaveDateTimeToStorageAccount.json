@@ -20,7 +20,10 @@
 						"additionalColumns": [
 							{
 								"name": "triggeredTime",
-								"value": ""
+								"value": {
+									"value": "@utcnow()",
+									"type": "Expression"
+								}
 							}
 						],
 						"storeSettings": {
@@ -47,13 +50,14 @@
 						"mappings": [
 							{
 								"source": {
-									"path": "$['deltaTime']"
+									"path": "triggeredTime"
 								},
 								"sink": {
 									"path": "$['deltaTime']"
 								}
 							}
-						]
+						],
+						"collectionReference": ""
 					}
 				},
 				"inputs": [
