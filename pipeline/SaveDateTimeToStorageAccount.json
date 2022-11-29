@@ -5,7 +5,14 @@
 			{
 				"name": "Copy data1",
 				"type": "Copy",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -21,7 +28,7 @@
 							{
 								"name": "triggeredTime",
 								"value": {
-									"value": "@utcnow()",
+									"value": "@adddays(variables('LastTriggeredDate'),1)",
 									"type": "Expression"
 								}
 							}
@@ -72,8 +79,65 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "Lookup1",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"modifiedDatetimeStart": "2022-11-29T00:00:00.344Z",
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"dataset": {
+						"referenceName": "Json1",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Lookup1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "LastTriggeredDate",
+					"value": {
+						"value": "@activity('Lookup1').output.firstRow.deltaTime",
+						"type": "Expression"
+					}
+				}
 			}
 		],
+		"variables": {
+			"LastTriggeredDate": {
+				"type": "String",
+				"defaultValue": "'1802-01-01T01:01:01.000Z'"
+			}
+		},
 		"annotations": []
 	}
 }
