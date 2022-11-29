@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "delta",
+				"fileName": "delta.json",
 				"folderPath": "settings",
 				"container": "adf"
 			}
